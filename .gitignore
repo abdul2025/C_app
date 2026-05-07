@@ -1,0 +1,38 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+appsettings.Development.json
+
+# NuGet
+packages/
+*.nupkg
+
+# Publish
+publish/
+
+# Test results
+TestResults/
+
+# Optional: VS Code
+.vscode/
