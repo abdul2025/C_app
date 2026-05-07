@@ -18,26 +18,6 @@ namespace consoleApp.Services
             _userRepository = userRepository;
         }
 
-        public IEnumerable<GitHubUserDto> ShowAllUser(IEnumerable<GitHubUserDto> users)
-        {
-            return users;
-        }
-
-
-
-        public IEnumerable<GitHubUserDto> GetHireAblUsers(IEnumerable<GitHubUserDto> users)
-        {
-            return users.Where(user => user.Hireable == true);
-        }
-
-        public IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)
-        {
-            return users.Where(user => user.Followers > numberOfFollowers);
-        }
-
-
-
-
 
         public async Task<GitHubUserDto?> GetGitHubUsers(string username)
         {
@@ -51,32 +31,61 @@ namespace consoleApp.Services
                 Console.WriteLine($"ERROR MESSAGE FROM API: {ex.Message}");
                 return null;
             }
-            
-
         }
 
 
-        public async Task<List<GitHubUserRepoDto>>GetGitHubUsersRepos(string username)
+        public async Task<IEnumerable<GitHubUserDto>> ExecuteParallelTaskForUsers(IEnumerable<Task<GitHubUserDto?>> tasks)
         {
-            try
-            {
-                return await _userRepository.GetUserRepoFromGitHubAsync($"{username}/repos");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ERROR MESSAGE FROM API: {ex.Message}");
-                return [];
-            }
+            return (await Task.WhenAll(tasks))
+                .Where(u => u != null)
+                .Select(u => u!)
+                .ToList();
         }
 
-
-
-
-
-        public Task<List<GitHubUserRepoDto>> ShowAllRepos(Task<List<GitHubUserRepoDto>> repo)
+        public IEnumerable<GitHubUserDto> ShowAllUser(IEnumerable<GitHubUserDto> users)
         {
-            return repo;
+            return users;
         }
+
+        public IEnumerable<GitHubUserDto> GetHireAblUsers(IEnumerable<GitHubUserDto> users)
+        {
+            return users.Where(user => user.Hireable == true);
+        }
+
+        public IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)
+        {
+            return users.Where(user => user.Followers > numberOfFollowers);
+        }
+
+
+
+        public void ShowData(IEnumerable<GitHubUserDto> data)
+        {
+            Console.WriteLine($"Number of users returned : {data.Count()}");
+
+            foreach (var user in data)
+            {
+                var json = JsonSerializer.Serialize(user, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                Console.WriteLine(json);            
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
     }
 }

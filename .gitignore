@@ -15,6 +15,10 @@ obj/
 # Logs
 *.log
 
+
+Environment initiator 
+*.sh
+
 # OS files
 .DS_Store
 Thumbs.db

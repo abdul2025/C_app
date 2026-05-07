@@ -7,16 +7,19 @@ namespace consoleApp.interfaces
 {
     public interface IUserServices
     {
-        Task<GitHubUserDto?> GetGitHubUsers(string username);
 
-        IEnumerable<GitHubUserDto>  ShowAllUser(IEnumerable<GitHubUserDto> users);
-        IEnumerable<GitHubUserDto>  GetHireAblUsers(IEnumerable<GitHubUserDto> users);
+        // Tasks
+        Task<GitHubUserDto?> GetGitHubUsers(string username);
+        Task<IEnumerable<GitHubUserDto>> ExecuteParallelTaskForUsers(IEnumerable<Task<GitHubUserDto?>> tasks);
+
+
+        // Data Processing
+        IEnumerable<GitHubUserDto> ShowAllUser(IEnumerable<GitHubUserDto> users);
+        IEnumerable<GitHubUserDto> GetHireAblUsers(IEnumerable<GitHubUserDto> users);
         IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers);
 
-        
-        Task<List<GitHubUserRepoDto>> GetGitHubUsersRepos(string username);
-        Task<List<GitHubUserRepoDto>> ShowAllRepos(Task<List<GitHubUserRepoDto>> repo);
-
+        // Displaying Data function
+        void ShowData(IEnumerable<GitHubUserDto> data);
 
     }
 }

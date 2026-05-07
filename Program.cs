@@ -14,6 +14,7 @@ var host = Host.CreateDefaultBuilder(args)
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserServices, UserService>();
+        services.AddScoped<IGitRepoServices, GitRepoServices>();
 
         // ✅ register your runner
         services.AddScoped<AppRunner>();

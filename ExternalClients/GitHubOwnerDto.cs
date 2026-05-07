@@ -9,6 +9,9 @@ public class GitHubOwnerDto
     [JsonPropertyName("login")]
     public string? Login { get; set; }
 
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
     [JsonPropertyName("html_url")]
     public string? HtmlUrl { get; set; }
 }
