@@ -14,7 +14,7 @@ namespace consoleApp.interfaces
 
 
         // Data Processing
-        IEnumerable<GitHubUserDto> ShowAllUser(IEnumerable<GitHubUserDto> users);
+        IEnumerable<GitHubUserDto> GetAllUser(IEnumerable<GitHubUserDto> users);
         IEnumerable<GitHubUserDto> GetHireAblUsers(IEnumerable<GitHubUserDto> users);
         IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers);
 

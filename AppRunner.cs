@@ -19,14 +19,14 @@ public class AppRunner
     {
         var listOfUsers = new List<string>
         {
-            // "torvalds",
-            // "gaearon",
-            // "yyx990803",
-            // "tj",
-            // "mojombo",
-            // "defunkt",
-            // "pjhyett",
-            // "dhh",
+            "torvalds",
+            "gaearon",
+            "yyx990803",
+            "tj",
+            "mojombo",
+            "defunkt",
+            "pjhyett",
+            "dhh",
             "getify",
             "substack",
             "isaacs"
@@ -39,17 +39,17 @@ public class AppRunner
             START Github User Service.
         */
 
-        var tasks = listOfUsers
-            .Select(user => _userService.GetGitHubUsers(user));
+        // var tasks = listOfUsers
+        //     .Select(user => _userService.GetGitHubUsers(user));
 
 
-        var collectedUsers = await _userService.ExecuteParallelTaskForUsers(tasks);
+        // var collectedUsers = await _userService.ExecuteParallelTaskForUsers(tasks);
 
-        var users = _userService.ShowAllUser(collectedUsers);
-        // var users = _userService.GetHireAblUsers(collectedUsers);
+        // // var users = _userService.ShowAllUser(collectedUsers);
+        // // var users = _userService.GetHireAblUsers(collectedUsers);
         // var users = _userService.filterUsers(collectedUsers, 1000);
 
-        _userService.ShowData(users);
+        // _userService.ShowData(users);
 
         /*
             END Github User Service.
@@ -72,31 +72,35 @@ public class AppRunner
         */
 
 
-        var tasksRepo = listOfUsers
-            .Select(user => _gitRepoService.GetGitHubUsersRepos(user));
+        var semaphore = new SemaphoreSlim(5); // Concurrency limit to 5 --> meaning  5 operation run at  the same time .
 
-        var collectedUsersRepo = (await Task.WhenAll(tasksRepo))
-            .Where(u => u != null)
-            .SelectMany(u => u!) // Flat list as All Users's Repos are in ONE list (To simulate DB relation later on (Relation in join, grouping, Sorting, UNION ...etc ))
-            .ToList();
+        var tasksRepo = listOfUsers.Select(async user =>
+        {
+            await semaphore.WaitAsync();
+            try
+            {
+                return await _gitRepoService.GetGitHubUsersRepos(user);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
+
+        var collectedUsersRepo = await _gitRepoService.ExecuteParallelTaskForRepos(tasksRepo);
+
 
   
 
-        var repos = _gitRepoService.ShowAllRepos(collectedUsersRepo);
+        var repos = _gitRepoService.GetAllRepos(collectedUsersRepo);
         // var repos = _gitRepoService.ShowPublicRepos(collectedUsersRepo);
         // var repos = _gitRepoService.ShowReposHasOpenIssuesOverFive(collectedUsersRepo, 5);
 
-        Console.WriteLine($"Number of Repo returned : {repos.Count()}");
-
-        foreach (var repo in repos)
-        {
-            var json = JsonSerializer.Serialize(repo, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-
-            // Console.WriteLine(json);            
-        }
+        _gitRepoService.ShowData(repos);
+        // foreach (var rep in repos)
+        // {
+        //     Console.WriteLine(rep.Name);
+        // }
 
 
         /*

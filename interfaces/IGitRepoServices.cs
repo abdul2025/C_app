@@ -8,10 +8,16 @@ namespace consoleApp.interfaces
     public interface IGitRepoServices
     {
         Task<List<GitHubUserRepoDto>> GetGitHubUsersRepos(string username);
-        IEnumerable<GitHubUserRepoDto> ShowAllRepos(IEnumerable<GitHubUserRepoDto> repos);
 
-        IEnumerable<GitHubUserRepoDto> ShowPublicRepos(IEnumerable<GitHubUserRepoDto> repos);
+Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks);
+        IEnumerable<GitHubUserRepoDto> GetAllRepos(IEnumerable<GitHubUserRepoDto> repos);
 
-        IEnumerable<GitHubUserRepoDto> ShowReposHasOpenIssuesOverFive(IEnumerable<GitHubUserRepoDto> repos, int numberOfIssues);
+        IEnumerable<GitHubUserRepoDto> GetPublicRepos(IEnumerable<GitHubUserRepoDto> repos);
+
+        IEnumerable<GitHubUserRepoDto> GetReposHasOpenIssuesOverFive(IEnumerable<GitHubUserRepoDto> repos, int numberOfIssues);
+
+
+        void ShowData(IEnumerable<GitHubUserRepoDto> data);
+
     }
 }

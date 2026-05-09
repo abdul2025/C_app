@@ -29,7 +29,7 @@ namespace consoleApp.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"ERROR MESSAGE FROM API: {ex.Message}");
-                return null;
+                return new GitHubUserDto();
             }
         }
 
@@ -42,7 +42,7 @@ namespace consoleApp.Services
                 .ToList();
         }
 
-        public IEnumerable<GitHubUserDto> ShowAllUser(IEnumerable<GitHubUserDto> users)
+        public IEnumerable<GitHubUserDto> GetAllUser(IEnumerable<GitHubUserDto> users)
         {
             return users;
         }
