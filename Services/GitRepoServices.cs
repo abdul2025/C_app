@@ -12,11 +12,15 @@ namespace consoleApp.Services
     public class GitRepoServices : IGitRepoServices
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAppLogger _logger;
 
 
-        public GitRepoServices(IUserRepository userRepository)
+
+        public GitRepoServices(IUserRepository userRepository, IAppLogger logger)
         {
             _userRepository = userRepository;
+            _logger = logger;
+
         }
 
 
@@ -26,12 +30,20 @@ namespace consoleApp.Services
         {
             try
             {
+                _logger.LogInfo("Fetching repos", new { username });
+
                 return await _userRepository.GetUserRepoFromGitHubAsync($"{username}/repos");
 
             }
-            catch (Exception ex)
+            catch (TaskCanceledException ex)
             {
-                Console.WriteLine($"ERROR MESSAGE FROM API: {ex.Message}");
+                _logger.LogError("Timeout while fetching repos", ex, new { username });
+                return new List<GitHubUserRepoDto>();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError("HTTP error while fetching repos", ex, new { username });
+
                 return new List<GitHubUserRepoDto>();
             }
         }

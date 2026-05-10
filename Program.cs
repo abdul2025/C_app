@@ -12,6 +12,9 @@ var host = Host.CreateDefaultBuilder(args)
     {
         services.AddHttpClient<GitHubApiClient>();
 
+        // IAppLogger Service
+        services.AddSingleton<IAppLogger, ConsoleLogger>();
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserServices, UserService>();
         services.AddScoped<IGitRepoServices, GitRepoServices>();

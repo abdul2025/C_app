@@ -11,11 +11,14 @@ namespace consoleApp.Services
     public class UserService : IUserServices
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAppLogger _logger;
 
 
-        public UserService(IUserRepository userRepository)
+
+        public UserService(IUserRepository userRepository, IAppLogger logger)
         {
             _userRepository = userRepository;
+            _logger = logger;
         }
 
 
@@ -26,9 +29,17 @@ namespace consoleApp.Services
                 return await _userRepository.GetUserFromGitHubAsync(username);
 
             }
-            catch (Exception ex)
+
+
+            catch (TaskCanceledException ex)
             {
-                Console.WriteLine($"ERROR MESSAGE FROM API: {ex.Message}");
+                _logger.LogError("Timeout while fetching repos", ex, new { username });
+                return new GitHubUserDto();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError("HTTP error while fetching repos", ex, new { username });
+
                 return new GitHubUserDto();
             }
         }
