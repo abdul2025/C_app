@@ -30,16 +30,9 @@ namespace consoleApp.Services
 
             }
 
-
-            catch (TaskCanceledException ex)
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 _logger.LogError("Timeout while fetching repos", ex, new { username });
-                return new GitHubUserDto();
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError("HTTP error while fetching repos", ex, new { username });
-
                 return new GitHubUserDto();
             }
         }
@@ -66,36 +59,7 @@ namespace consoleApp.Services
         public IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)
         {
             return users.Where(user => user.Followers > numberOfFollowers);
-        }
-
-
-
-        public void ShowData(IEnumerable<GitHubUserDto> data)
-        {
-            Console.WriteLine($"Number of users returned : {data.Count()}");
-
-            foreach (var user in data)
-            {
-                var json = JsonSerializer.Serialize(user, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                Console.WriteLine(json);            
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-        
+        } 
 
 
     }

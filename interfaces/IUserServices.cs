@@ -19,7 +19,6 @@ namespace consoleApp.interfaces
         IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers);
 
         // Displaying Data function
-        void ShowData(IEnumerable<GitHubUserDto> data);
 
     }
 }

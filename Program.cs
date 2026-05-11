@@ -1,5 +1,6 @@
 ﻿using consoleApp;
 using consoleApp.ExternalClients;
+using consoleApp.Infrastructure;
 using consoleApp.interfaces;
 using consoleApp.Repositories;
 using consoleApp.Services;
@@ -14,10 +15,14 @@ var host = Host.CreateDefaultBuilder(args)
 
         // IAppLogger Service
         services.AddSingleton<IAppLogger, ConsoleLogger>();
+        services.AddSingleton<IOutputWriter, ConsoleWriter>();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserServices, UserService>();
         services.AddScoped<IGitRepoServices, GitRepoServices>();
+
+
+
 
         // ✅ register your runner
         services.AddScoped<AppRunner>();

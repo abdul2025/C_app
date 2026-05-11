@@ -8,11 +8,14 @@ public class AppRunner
 {
     private readonly IUserServices _userService;
     private readonly IGitRepoServices _gitRepoService;
+    private readonly IOutputWriter _outputWriter;
 
-    public AppRunner(IUserServices userService, IGitRepoServices gitRepoService)
+
+    public AppRunner(IUserServices userService, IGitRepoServices gitRepoService, IOutputWriter outputWriter)
     {
         _userService = userService;
         _gitRepoService = gitRepoService;
+        _outputWriter = outputWriter;
     }
 
     public async Task RunAsync()
@@ -39,17 +42,18 @@ public class AppRunner
             START Github User Service.
         */
 
-        // var tasks = listOfUsers
-        //     .Select(user => _userService.GetGitHubUsers(user));
+        var tasks = listOfUsers
+            .Select(user => _userService.GetGitHubUsers(user));
 
 
-        // var collectedUsers = await _userService.ExecuteParallelTaskForUsers(tasks);
+        var collectedUsers = await _userService.ExecuteParallelTaskForUsers(tasks);
 
-        // // var users = _userService.ShowAllUser(collectedUsers);
-        // // var users = _userService.GetHireAblUsers(collectedUsers);
-        // var users = _userService.filterUsers(collectedUsers, 1000);
+        // var users = _userService.ShowAllUser(collectedUsers);
+        // var users = _userService.GetHireAblUsers(collectedUsers);
+        var users = _userService.filterUsers(collectedUsers, 1000);
 
-        // _userService.ShowData(users);
+        _outputWriter.ShowData(users);
+
 
         /*
             END Github User Service.
@@ -72,31 +76,18 @@ public class AppRunner
         */
 
 
-        var semaphore = new SemaphoreSlim(5); // Concurrency limit to 5 --> meaning  5 operation run at  the same time .
+        // var tasksRepo = listOfUsers.Select(user =>  _gitRepoService.GetGitHubUsersRepos(user));
 
-        var tasksRepo = listOfUsers.Select(async user =>
-        {
-            await semaphore.WaitAsync();
-            try
-            {
-                return await _gitRepoService.GetGitHubUsersRepos(user);
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        });
-
-        var collectedUsersRepo = await _gitRepoService.ExecuteParallelTaskForRepos(tasksRepo);
+        // var collectedUsersRepo = await _gitRepoService.ExecuteParallelTaskForRepos(tasksRepo);
 
 
   
 
-        var repos = _gitRepoService.GetAllRepos(collectedUsersRepo);
+        // var repos = _gitRepoService.GetAllRepos(collectedUsersRepo);
         // var repos = _gitRepoService.ShowPublicRepos(collectedUsersRepo);
         // var repos = _gitRepoService.ShowReposHasOpenIssuesOverFive(collectedUsersRepo, 5);
 
-        _gitRepoService.ShowData(repos);
+        // _outputWriter.ShowData(repos);
         // foreach (var rep in repos)
         // {
         //     Console.WriteLine(rep.Name);

@@ -35,17 +35,12 @@ namespace consoleApp.Services
                 return await _userRepository.GetUserRepoFromGitHubAsync($"{username}/repos");
 
             }
-            catch (TaskCanceledException ex)
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 _logger.LogError("Timeout while fetching repos", ex, new { username });
                 return new List<GitHubUserRepoDto>();
             }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError("HTTP error while fetching repos", ex, new { username });
 
-                return new List<GitHubUserRepoDto>();
-            }
         }
 
             public async Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks)
@@ -78,20 +73,7 @@ namespace consoleApp.Services
             return repos.Where(repo => repo.OpenIssues >= numberOfIssues);
         }
 
-        public void ShowData(IEnumerable<GitHubUserRepoDto> data)
-        {
-            Console.WriteLine($"Number of Repos returned : {data.Count()}");
-
-            // foreach (var user in data)
-            // {
-            //     var json = JsonSerializer.Serialize(user, new JsonSerializerOptions
-            //     {
-            //         WriteIndented = true
-            //     });
-
-            //     Console.WriteLine(json);            
-            // }
-        }
+        
         
     }
 }

@@ -9,7 +9,7 @@ namespace consoleApp.interfaces
     {
         Task<List<GitHubUserRepoDto>> GetGitHubUsersRepos(string username);
 
-Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks);
+        Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks);
         IEnumerable<GitHubUserRepoDto> GetAllRepos(IEnumerable<GitHubUserRepoDto> repos);
 
         IEnumerable<GitHubUserRepoDto> GetPublicRepos(IEnumerable<GitHubUserRepoDto> repos);
@@ -17,7 +17,6 @@ Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Tas
         IEnumerable<GitHubUserRepoDto> GetReposHasOpenIssuesOverFive(IEnumerable<GitHubUserRepoDto> repos, int numberOfIssues);
 
 
-        void ShowData(IEnumerable<GitHubUserRepoDto> data);
 
     }
 }
