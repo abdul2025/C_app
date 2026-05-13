@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using consoleApp.interfaces;
+using consoleApp.Interfaces;
 using System.Text.Json;
 
 
@@ -24,26 +24,29 @@ namespace consoleApp.Services
         }
 
 
-
-
-        public async Task<List<GitHubUserRepoDto>>GetGitHubUsersRepos(string username)
+        public async Task<List<GitHubUserRepoDto>>GetGitHubUsersRepos(string username, CancellationToken token)
         {
             try
             {
                 _logger.LogInfo("Fetching repos", new { username });
 
-                return await _userRepository.GetUserRepoFromGitHubAsync($"{username}/repos");
+                return await _userRepository.GetUserRepoFromGitHubAsync($"{username}/repos", token);
 
             }
-            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
+            // Catch specific ERRORs as per what expecting from the above function ERRORS
+            catch (Exception ex) when (
+                    ex is HttpRequestException || ex is TaskCanceledException || ex is JsonException
+                )
             {
-                _logger.LogError("Timeout while fetching repos", ex, new { username });
+                _logger.LogError("Error while fetching Repos", ex, new { username });
+                // no throw to stopping the function needed here 
+                // throw;
                 return new List<GitHubUserRepoDto>();
             }
 
         }
 
-            public async Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks)
+            public async Task<IEnumerable<GitHubUserRepoDto>> AsyncTaskServiceForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks)
             {
                 var results = await Task.WhenAll(tasks);
 
@@ -52,10 +55,6 @@ namespace consoleApp.Services
                     .SelectMany(list => list) // Flat list as All Users's Repos are in ONE list (To simulate DB relation later on (Relation in join, grouping, Sorting, UNION ...etc ))
                     .ToList();
             }
-
-
-
-
 
         public IEnumerable<GitHubUserRepoDto> GetAllRepos(IEnumerable<GitHubUserRepoDto> repos)
         {
@@ -73,7 +72,5 @@ namespace consoleApp.Services
             return repos.Where(repo => repo.OpenIssues >= numberOfIssues);
         }
 
-        
-        
     }
 }

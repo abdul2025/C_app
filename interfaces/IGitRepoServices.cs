@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace consoleApp.interfaces
+namespace consoleApp.Interfaces
 {
     public interface IGitRepoServices
     {
-        Task<List<GitHubUserRepoDto>> GetGitHubUsersRepos(string username);
+        Task<List<GitHubUserRepoDto>> GetGitHubUsersRepos(string username, CancellationToken token);
 
-        Task<IEnumerable<GitHubUserRepoDto>> ExecuteParallelTaskForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks);
+        Task<IEnumerable<GitHubUserRepoDto>> AsyncTaskServiceForRepos(IEnumerable<Task<List<GitHubUserRepoDto>>> tasks);
         IEnumerable<GitHubUserRepoDto> GetAllRepos(IEnumerable<GitHubUserRepoDto> repos);
 
         IEnumerable<GitHubUserRepoDto> GetPublicRepos(IEnumerable<GitHubUserRepoDto> repos);

@@ -97,7 +97,7 @@ chmod +x run.sh
 - `ExecuteParallelTaskForUsers(IEnumerable<Task<GitHubUserDto?>> tasks)`: Executes multiple user fetch tasks in parallel
 - `ShowAllUser(IEnumerable<GitHubUserDto> users)`: Returns all users (no filtering)
 - `GetHireAblUsers(IEnumerable<GitHubUserDto> users)`: Filters users who are hireable
-- `filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)`: Filters users by minimum follower count
+- `FilterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)`: Filters users by minimum follower count
 - `ShowData(IEnumerable<GitHubUserDto> data)`: Displays user data in JSON format
 
 ### Repository Services (`IGitRepoServices`)

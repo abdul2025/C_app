@@ -1,10 +1,6 @@
 
-using consoleApp.interfaces;
+using consoleApp.Interfaces;
 using consoleApp.ExternalClients;
-
-
-
-
 
 
 namespace consoleApp.Repositories
@@ -12,20 +8,20 @@ namespace consoleApp.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly GitHubApiClient _apiService;
-        private static readonly SemaphoreSlim _semaphore = new(5); // we use SemaphoreSlim to handle concurrent operation with only 5 run together to avoid overwhelming or throttling the API
+        private readonly SemaphoreSlim _semaphore;
 
-
-        public UserRepository(GitHubApiClient apiService)
+        public UserRepository(GitHubApiClient apiService, SemaphoreSlim semaphore)
         {
             _apiService = apiService;
+            _semaphore = semaphore;
         }
 
-        public async Task<GitHubUserDto?> GetUserFromGitHubAsync(string urlPath)
+        public async Task<GitHubUserDto?> GetUserFromGitHubAsync(string urlPath, CancellationToken token)
         {
             await _semaphore.WaitAsync();
             try
             {
-                return await _apiService.GetReq<GitHubUserDto>(urlPath);
+                return await _apiService.GetReq<GitHubUserDto>(urlPath, token);
             }
             finally
             {
@@ -34,12 +30,13 @@ namespace consoleApp.Repositories
         }
 
 
-        public async Task<List<GitHubUserRepoDto>> GetUserRepoFromGitHubAsync(string urlPath)
+        public async Task<List<GitHubUserRepoDto>?> GetUserRepoFromGitHubAsync(string urlPath, CancellationToken token)
         {
             await _semaphore.WaitAsync();
+
             try
             {
-                return await _apiService.GetReq<List<GitHubUserRepoDto>>(urlPath);
+                return await _apiService.GetReq<List<GitHubUserRepoDto>>(urlPath, token);
             }
             finally
             {

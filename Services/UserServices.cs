@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
-using consoleApp.interfaces;
+using consoleApp.Interfaces;
 
 
 namespace consoleApp.Services
@@ -22,23 +22,24 @@ namespace consoleApp.Services
         }
 
 
-        public async Task<GitHubUserDto?> GetGitHubUsers(string username)
+        public async Task<GitHubUserDto?> GetGitHubUsers(string username, CancellationToken token)
         {
             try
             {
-                return await _userRepository.GetUserFromGitHubAsync(username);
+                return await _userRepository.GetUserFromGitHubAsync(username, token);
 
             }
-
-            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
+            catch (Exception ex)
             {
-                _logger.LogError("Timeout while fetching repos", ex, new { username });
-                return new GitHubUserDto();
+                _logger.LogError("Error while fetching Users", ex, new { username });
+                // no throw stopping the function needed here 
+                // throw;
+                return null;
             }
         }
 
 
-        public async Task<IEnumerable<GitHubUserDto>> ExecuteParallelTaskForUsers(IEnumerable<Task<GitHubUserDto?>> tasks)
+        public async Task<IEnumerable<GitHubUserDto>> AsyncTaskServiceForUsers(IEnumerable<Task<GitHubUserDto?>> tasks)
         {
             return (await Task.WhenAll(tasks))
                 .Where(u => u != null)
@@ -56,7 +57,7 @@ namespace consoleApp.Services
             return users.Where(user => user.Hireable == true);
         }
 
-        public IEnumerable<GitHubUserDto> filterUsers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)
+        public IEnumerable<GitHubUserDto> FilterUsersByNumOfFollowers(IEnumerable<GitHubUserDto> users, int numberOfFollowers)
         {
             return users.Where(user => user.Followers > numberOfFollowers);
         } 

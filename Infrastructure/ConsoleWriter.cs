@@ -1,5 +1,5 @@
 using System.Text.Json;
-using consoleApp.interfaces;
+using consoleApp.Interfaces;
 
 namespace consoleApp.Infrastructure
 {
@@ -11,7 +11,7 @@ namespace consoleApp.Infrastructure
         {
             _logger = logger;
         }
-        public void ShowData<T>(IEnumerable<T> data)
+        public async void ShowData<T>(IEnumerable<T> data)
         {
             if (data == null)
             {
@@ -21,8 +21,13 @@ namespace consoleApp.Infrastructure
 
             var list = data.ToList(); 
 
-            _logger.LogInfo($"Count: {list.Count}");
-
+            _logger.LogInfo(
+                "Collection Counted",
+                new
+                {
+                    Count = list.Count,
+                    Type = typeof(T).Name
+                });
 
             foreach (var item in list)
             {

@@ -1,6 +1,7 @@
-using consoleApp.ExternalClients;
-using consoleApp.interfaces;
-using System.Text.Json;
+using consoleApp.Interfaces;
+using consoleApp.Models;
+using Microsoft.Extensions.Options;
+
 
 namespace consoleApp;
 
@@ -9,31 +10,24 @@ public class AppRunner
     private readonly IUserServices _userService;
     private readonly IGitRepoServices _gitRepoService;
     private readonly IOutputWriter _outputWriter;
+    private readonly GitHubOptions _options;
 
 
-    public AppRunner(IUserServices userService, IGitRepoServices gitRepoService, IOutputWriter outputWriter)
+    public AppRunner(IUserServices userService, IGitRepoServices gitRepoService, IOutputWriter outputWriter, IOptions<GitHubOptions> options)
     {
         _userService = userService;
         _gitRepoService = gitRepoService;
         _outputWriter = outputWriter;
+        _options = options.Value;
     }
 
-    public async Task RunAsync()
+    public async Task RunAsync(CancellationToken token)
     {
-        var listOfUsers = new List<string>
+        if (_options.Usernames?.Any() != true)
         {
-            "torvalds",
-            "gaearon",
-            "yyx990803",
-            "tj",
-            "mojombo",
-            "defunkt",
-            "pjhyett",
-            "dhh",
-            "getify",
-            "substack",
-            "isaacs"
-        };
+            return;
+        }
+        var listOfUsers = _options.Usernames;
 
 
         /*
@@ -42,15 +36,16 @@ public class AppRunner
             START Github User Service.
         */
 
+
         var tasks = listOfUsers
-            .Select(user => _userService.GetGitHubUsers(user));
+            .Select(user => _userService.GetGitHubUsers(user, token));
 
 
-        var collectedUsers = await _userService.ExecuteParallelTaskForUsers(tasks);
+        var collectedUsers = await _userService.AsyncTaskServiceForUsers(tasks);
 
         // var users = _userService.ShowAllUser(collectedUsers);
         // var users = _userService.GetHireAblUsers(collectedUsers);
-        var users = _userService.filterUsers(collectedUsers, 1000);
+        var users = _userService.FilterUsersByNumOfFollowers(collectedUsers, 1000);
 
         _outputWriter.ShowData(users);
 
@@ -78,7 +73,7 @@ public class AppRunner
 
         // var tasksRepo = listOfUsers.Select(user =>  _gitRepoService.GetGitHubUsersRepos(user));
 
-        // var collectedUsersRepo = await _gitRepoService.ExecuteParallelTaskForRepos(tasksRepo);
+        // var collectedUsersRepo = await _gitRepoService.AsyncTaskServiceForRepos(tasksRepo);
 
 
   
@@ -88,10 +83,7 @@ public class AppRunner
         // var repos = _gitRepoService.ShowReposHasOpenIssuesOverFive(collectedUsersRepo, 5);
 
         // _outputWriter.ShowData(repos);
-        // foreach (var rep in repos)
-        // {
-        //     Console.WriteLine(rep.Name);
-        // }
+ 
 
 
         /*
@@ -110,16 +102,16 @@ public class AppRunner
 
 
         /*
-            START SQL Operation.
-            START SQL Operation.
-            START SQL Operation.
+            START Query & Aggregation Operation.
+            START Query & Aggregation Operation.
+            START Query & Aggregation Operation.
         */
 
 
         /*
-            END SQL Operation.
-            END SQL Operation.
-            END SQL Operation.
+            END Query & Aggregation Operation.
+            END Query & Aggregation Operation.
+            END Query & Aggregation Operation.
         */
 
         
