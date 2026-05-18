@@ -28,13 +28,15 @@ namespace consoleApp.Infrastructure
                     Count = list.Count,
                     Type = typeof(T).Name
                 });
-
-            foreach (var item in list)
+            
+            var options = new JsonSerializerOptions
             {
-                var json = JsonSerializer.Serialize(item, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+                WriteIndented = true
+            };
+
+            foreach (var item in list.Take(3))
+            {
+                var json = JsonSerializer.Serialize(item, options);
 
                 Console.WriteLine(json);
 

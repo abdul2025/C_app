@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
-        logging.ClearProviders();
+        logging.ClearProviders(); // Strop the dotnet C# defualet log come up in the terminal.
     })
     .ConfigureServices((context, services) =>
     {
@@ -36,6 +36,15 @@ var host = Host.CreateDefaultBuilder(args)
             // shared gate to the External GitHub APIs which controlled by the MAX Concurrency
             // in Case of muilt APIs we should use AddSingleton but with helper function for further distinguish and avoid multi APIs Concurrency blocking each other
         });
+
+
+
+        // Retrial and Exponential backoff
+        services.AddSingleton(sp =>
+        {
+            var logger = sp.GetRequiredService<IAppLogger>();
+            return RetryPolicyFactory.CreateHttpRetryPolicy(logger, 3);
+        });
         
 
 
@@ -48,7 +57,7 @@ var host = Host.CreateDefaultBuilder(args)
 
         // App Services
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IUserServices, UserService>();
+        services.AddScoped<IGitHubUserService, GitHubUserService>();
         services.AddScoped<IGitRepoServices, GitRepoServices>();
 
 
